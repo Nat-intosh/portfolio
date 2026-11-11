@@ -1,0 +1,21 @@
+{
+  "name": "portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portfolio monorepo: Nuxt 4 frontend + Strapi 5 CMS",
+  "scripts": {
+    "dev": "concurrently -n strapi,nuxt -c magenta,cyan \"npm run dev:strapi\" \"npm run dev:nuxt\"",
+    "dev:strapi": "npm --prefix strapi run develop",
+    "dev:nuxt": "npm --prefix nuxt run dev",
+    "build": "npm run build:strapi && npm run build:nuxt",
+    "build:strapi": "npm --prefix strapi run build",
+    "build:nuxt": "npm --prefix nuxt run build",
+    "install:all": "npm install --prefix strapi && npm install --prefix nuxt"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=24.15.0"
+  }
+}
