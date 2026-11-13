@@ -42,8 +42,6 @@ services:
     volumes:
       - ./data/strapi/db:/app/.tmp
       - ./data/strapi/uploads:/app/public/uploads
-    expose:
-      - "1337"
     healthcheck:
       test:
         - CMD
@@ -56,6 +54,7 @@ services:
       start_period: 90s
     networks:
       - backend
+      - npm
 
   nuxt:
     build:
@@ -79,8 +78,6 @@ services:
     depends_on:
       strapi:
         condition: service_healthy
-    expose:
-      - "3000"
     healthcheck:
       test:
         - CMD
@@ -93,35 +90,10 @@ services:
       start_period: 60s
     networks:
       - backend
-      - web
-
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    logging: *default-logging
-    depends_on:
-      nuxt:
-        condition: service_healthy
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    environment:
-      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
-      API_DOMAIN: ${API_DOMAIN:?Set API_DOMAIN in .env}
-      ACME_EMAIL: ${ACME_EMAIL:-contact@nellvand.fr}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - web
-      - backend
-
-volumes:
-  caddy_data:
-  caddy_config:
+      - npm
 
 networks:
   backend:
-  web:
+  npm:
+    external: true
+    name: ${NPM_NETWORK:-npm_default}

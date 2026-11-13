@@ -69,13 +69,16 @@ npm --prefix strapi run console            # Strapi REPL
 
 ## Docker deployment
 
-The repository includes a production-oriented Docker Compose setup:
+The repository includes a production Docker Compose setup designed to sit
+behind the existing **Nginx Proxy Manager** container (`npm-app-1`). NPM
+handles the public hostnames, TLS certificates and ports `80`/`443`. The Nuxt
+and Strapi containers join NPM's Docker network and are **not** published on
+the host.
 
 ```text
 .
-├── docker-compose.yml       # Strapi + Nuxt + Caddy
-├── Caddyfile                # HTTPS reverse proxy for the two hostnames
-├── .env.example             # Compose secrets and public URLs
+├── docker-compose.yml       # Strapi + Nuxt, attached to NPM's Docker network
+├── .env.example             # Compose secrets, public URLs and NPM network
 ├── nuxt/Dockerfile          # Builds the standalone Nuxt server
 ├── strapi/Dockerfile        # Builds the Strapi admin + server
 └── strapi/docker-entrypoint.sh
@@ -93,15 +96,28 @@ Both directories are ignored by git and must be backed up.
 ### Requirements
 
 - A Linux server with Docker Engine and the Docker Compose plugin
-- Two DNS records pointing to the server:
+- Nginx Proxy Manager already running in Docker (`npm-app-1`)
+- Two DNS records pointing to the NPM server:
   - `nellvand.fr` (or your main domain)
   - `api.nellvand.fr` (or your API subdomain)
-- Inbound TCP ports `80` and `443` open
 - Enough RAM for the Strapi admin build (about 1.5 GB). On a smaller VPS, add
   swap or build the images on another machine and push them to a registry.
 
-Caddy obtains and renews TLS certificates automatically. Start the stack only
-after the DNS records resolve to the server.
+### NPM network
+
+The container name `npm-app-1` means the NPM Compose project is named `npm`, so
+its default network is normally `npm_default`. Verify it with:
+
+```bash
+docker inspect npm-app-1 \
+  --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{"\n"}}{{end}}'
+```
+
+If the output is not `npm_default`, set the real name in `.env`:
+
+```env
+NPM_NETWORK=the_real_network_name
+```
 
 ### First deployment
 
@@ -111,9 +127,8 @@ after the DNS records resolve to the server.
    cp .env.example .env
    ```
 
-   At minimum, change `DOMAIN`, `API_DOMAIN`, `NUXT_PUBLIC_STRAPI_URL`,
-   `PUBLIC_URL`, `CORS_ORIGINS`, and all Strapi secrets. Generate each secret
-   with:
+   At minimum, change `NUXT_PUBLIC_STRAPI_URL`, `PUBLIC_URL`, `CORS_ORIGINS`,
+   `NPM_NETWORK` if needed, and all Strapi secrets. Generate each secret with:
 
    ```bash
    openssl rand -base64 32
@@ -150,17 +165,49 @@ after the DNS records resolve to the server.
    docker compose up -d --build
    ```
 
-4. Follow the startup logs:
+4. Verify that both containers joined NPM's network:
 
    ```bash
-   docker compose logs -f strapi
-   docker compose logs -f nuxt
+   docker network inspect npm_default \
+     --format '{{range .Containers}}{{.Name}} {{end}}'
    ```
 
-5. Open:
+   Replace `npm_default` with your `NPM_NETWORK` value if it is different. You
+   should see the Strapi and Nuxt containers in the list.
+
+5. Configure Nginx Proxy Manager:
+
+   | Setting | Main site | API |
+   | --- | --- | --- |
+   | Domain Names | `nellvand.fr` | `api.nellvand.fr` |
+   | Scheme | `http` | `http` |
+   | Forward Hostname / IP | `nuxt` | `strapi` |
+   | Forward Port | `3000` | `1337` |
+   | Websockets Support | optional | optional |
+   | Block Common Exploits | on | on |
+   | SSL | request a new Let's Encrypt certificate | same |
+   | Force SSL | on | on |
+   | HTTP/2 Support | on | on |
+
+   NPM resolves the Docker service names `nuxt` and `strapi` on the shared
+   network. No host port is needed.
+
+6. Open:
 
    - Portfolio: `https://nellvand.fr`
    - Strapi admin: `https://api.nellvand.fr/admin`
+
+### If NPM cannot reach the containers
+
+- Confirm `NPM_NETWORK` matches the network printed by `docker inspect`.
+- Confirm both stacks are running: `docker compose ps`.
+- Confirm the containers appear in
+  `docker network inspect <network> --format '{{range .Containers}}{{.Name}} {{end}}'`.
+- As a fallback, use the full container names `portfolio-nuxt-1` and
+  `portfolio-strapi-1` in NPM instead of the service names.
+
+The `PROXY=true` value is already set in `docker-compose.yml`, so Strapi trusts
+the `X-Forwarded-*` headers sent by NPM.
 
 ### Updating
 
@@ -208,14 +255,12 @@ the container can keep running as the unprivileged `node` user.
   `/uploads/...` media.
 - `CORS_ORIGINS` must contain the public frontend origin
   (`https://nellvand.fr`). Add `https://www.nellvand.fr` only if you also
-  configure that hostname in Caddy and DNS.
+  configure that hostname in DNS and NPM.
+- NPM is the only public entry point. The Nuxt and Strapi containers have no
+  published host ports.
 - If Cloudflare proxies the domain, set SSL/TLS mode to **Full (strict)**.
-  Caddy can still obtain its certificate through the HTTP-01 challenge. If
-  HTTP validation is blocked, use Cloudflare DNS-only for the initial
-  certificate issuance or configure a DNS challenge in Caddy.
-- If you already run a reverse proxy on the host, remove the `caddy` service
-  from `docker-compose.yml`, publish the Nuxt and Strapi ports on localhost
-  instead, and point your proxy at them.
+  Cloudflare connects to NPM, and NPM terminates the certificate from Let's
+  Encrypt.
 - On an SELinux-enabled host, append `:Z` to the two Strapi bind mounts
   (`./data/strapi/db:/app/.tmp:Z` and
   `./data/strapi/uploads:/app/public/uploads:Z`).
@@ -228,22 +273,25 @@ the container can keep running as the unprivileged `node` user.
   docker compose config
   ```
 
-- If HTTPS fails, check DNS propagation and Caddy's logs:
+- Check container status:
 
   ```bash
-  docker compose logs -f caddy
+  docker compose ps
   ```
 
-- If the site is empty, check Strapi first:
+- If NPM returns `502 Bad Gateway`, verify that `NPM_NETWORK` is correct and
+  that NPM can resolve `nuxt` and `strapi` on that network.
+- If the API works but the browser shows CORS errors, check
+  `CORS_ORIGINS` and restart Strapi.
+- If images return 404, verify that `NUXT_PUBLIC_STRAPI_URL` and `PUBLIC_URL`
+  use the public API hostname and that `data/strapi/uploads` contains the
+  expected files.
+- Inspect container logs with:
 
   ```bash
   docker compose logs -f strapi
   docker compose logs -f nuxt
   ```
-
-- If images return 404, verify that `NUXT_PUBLIC_STRAPI_URL` and `PUBLIC_URL`
-  use the public API hostname and that `data/strapi/uploads` contains the
-  expected files.
 
 ### Switching to PostgreSQL later
 
@@ -254,7 +302,7 @@ instances or higher write concurrency, switch to PostgreSQL:
 1. Add the `pg` dependency to `strapi/package.json`.
 2. Add a PostgreSQL service with a persistent volume to `docker-compose.yml`.
 3. Set `DATABASE_CLIENT=postgres`, `DATABASE_HOST=db`,
-   `DATABASE_NAME`, `DATABASE_USERNAME`, and `DATABASE_PASSWORD`.
+   `DATABASE_NAME`, `DATABASE_USERNAME`, and `DATABASE_PASSWORD` in `.env`.
 4. Export the SQLite content with Strapi's data-transfer commands and import
    it into the new database before switching traffic.
 
