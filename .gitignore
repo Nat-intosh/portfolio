@@ -10,6 +10,12 @@ node_modules/
 *.log
 logs/
 
+# Docker runtime data (SQLite database, uploads)
+/data/
+
+# Local Compose overrides
+docker-compose.override.yml
+
 # OS / editors
 .DS_Store
 Thumbs.db

@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_project_multiple_medias",
+  "info": {
+    "displayName": "multiple_medias",
+    "icon": "medium"
+  },
+  "options": {},
+  "attributes": {
+    "medias": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

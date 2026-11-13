@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_project_texts",
+  "info": {
+    "displayName": "text",
+    "icon": "bold"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "heading",
+        "paragraph",
+        "button"
+      ]
+    },
+    "link": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

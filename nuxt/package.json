@@ -7,10 +7,14 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "fix:lottie": "node scripts/patch-hero-lottie.mjs",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@iconify-json/lucide": "^1.2.153",
+    "@nuxt/icon": "^2.6.2",
     "@tailwindcss/vite": "^4.3.5",
+    "lottie-web": "^5.13.0",
     "nuxt": "^4.6.4",
     "tailwindcss": "^4.3.5",
     "vue": "^3.5.45",
