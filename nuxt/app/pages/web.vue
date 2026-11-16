@@ -286,7 +286,7 @@ onBeforeUnmount(() => {
         <div class="px-4 pb-10 pt-10">
           <h2 class="font-mattone text-2xl">{{ current.title }}</h2>
           <p class="mt-1 font-mattone text-lg">{{ current.subtitle }}</p>
-            <p class="mt-4 line-clamp-3 text-sm leading-snug">{{ current.excerpt }}</p>
+            <p class="mt-4 text-sm leading-snug">{{ current.excerpt }}</p>
           
           <p class="mt-5 text-sm leading-snug">
               {{ current.date }}
