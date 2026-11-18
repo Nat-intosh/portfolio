@@ -132,16 +132,28 @@ const portfolio = {
 
 // Project categories come from Strapi. A category without its own image falls
 // back to the cover of its first project.
+const CATEGORY_ORDER = ['technique', 'audiovisuel', 'design', 'web']
+
+const normalize = (s: string) =>
+  s.normalize('NFD').replace(/\p{Diacritic}/gu, '').trim().toLowerCase()
+
+const categoryRank = (title: string) => {
+  const i = CATEGORY_ORDER.indexOf(normalize(title))
+  return i === -1 ? CATEGORY_ORDER.length : i
+}
+
 const portfolioItems = computed(() =>
-  categories.value.map((category) => ({
-    title: category.title,
-    subtitle: category.subtitle ?? '',
-    to: `/${strapiSlug(category.title)}`,
-    image: mediaUrl(
-      category.image ?? category.projects?.[0]?.cover ?? null,
-      'large',
-    ),
-  })),
+  [...(categories.value ?? [])]
+    .sort((a, b) => categoryRank(a.title) - categoryRank(b.title))
+    .map((category) => ({
+      title: category.title,
+      subtitle: category.subtitle ?? '',
+      to: `/${strapiSlug(category.title)}`,
+      image: mediaUrl(
+        category.image ?? category.projects?.[0]?.cover ?? null,
+        'large',
+      ),
+    })),
 )
 
 const skills = {
@@ -150,13 +162,13 @@ const skills = {
     {
       icon: 'lucide:sun',
       title: 'Lumière',
-      description: 'Plans, visualisations, choix et installation du matériel, pupitrage',
+      description: 'Plans, visualisations, choix et installation du matériel, pupitrage et distribution',
       tools: 'GrandMA3, GrandMA2, Dot2, Capture SE',
     },
     {
       icon: 'lucide:volume-2',
       title: 'Son',
-      description: 'Choix et installation du matériel, captation et mixage',
+      description: 'Choix et installation du matériel, distribution, captation et mixage',
       tools: 'Yamaha, Midas, Behringer, Protools, Ableton',
     },
     {
@@ -196,7 +208,7 @@ const tools = {
   items: [
     {
       title: 'Fiche tech builder',
-      description: 'Un petit outil fait maison pour vous aider à faire des fiches techniques complètes et utilisable pour tout le monde.',
+      description: 'Un petit outil fait maison pour vous aider à faire des fiches techniques complètes et utilisables pour tout le monde.',
       label: 'Disponible prochainement',
       to: '/outils/fiche-tech-builder',
     },
@@ -364,7 +376,7 @@ const cta = {
                 {{ tool.title }}
               </h3>
               <p class="mt-3 text-xs leading-snug text-white/90 md:text-sm">{{ tool.description }}</p>
-              <NuxtLink :to="tool.to" class="mt-3 inline-block text-xs underline underline-offset-2">
+              <NuxtLink :to="tool.to" class="mt-3 inline-block text-sm font-mattone hover:underline underline-offset-2">
                 {{ tool.label }}
               </NuxtLink>
             </li>

@@ -72,12 +72,12 @@ onMounted(() => {
 onBeforeUnmount(() => resizeObserver?.disconnect())
 </script>
 <template>
-    <footer class="overflow-hidden text-[#0E0E10] font-porpora bg-[#0E0E10]">
+    <footer class="overflow-hidden text-[#0E0E10] font-porpora bg-white">
             <div class="max-w-6xl mx-auto bg-white md:rounded-tl-xl md:rounded-tr-xl mask-clip-padding">
                 <p ref="nameBox" class="select-none" aria-hidden="true">
                     <span
                     ref="nameText"
-                    class="block w-fit whitespace-nowrap font-mattone text-[12vw] font-bold leading-[0.9] tracking-tight"
+                    class="block w-fit -mt-2 md:-mt-3 whitespace-nowrap font-mattone text-[12vw] font-bold leading-[0.9] tracking-tight"
                     >
                     Nell Vandaele
                     </span>
