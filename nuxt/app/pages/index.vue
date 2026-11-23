@@ -3,9 +3,45 @@ import type { AnimationItem } from 'lottie-web'
 // Run `npm run fix:lottie` after each Cavalry export to normalize the JSON.
 import heroAnimationUrl from '~/assets/lottie/hero.json?url'
 
+const siteUrl = 'https://nellvand.fr'
+const localTitle = 'Technicien·ne son & lumière, vidéo, design et web à Bordeaux'
+const localDescription = `${localTitle}. Je fais briller vos scènes, vos écrans et votre image.`
+
 useSeoMeta({
-  title: 'Nell Vandaele — Technique, audiovisuel, design & web',
-  description: 'Là pour faire briller vos scènes, vos écrans et votre image.',
+  title: `Nell Vandaele — ${localTitle}`,
+  description: localDescription,
+  keywords:
+    'technicien son lumière Bordeaux, vidéo Bordeaux, design Bordeaux, web Bordeaux, régie évènementielle, audiovisuel, Nell Vandaele',
+  robots: 'index, follow',
+  ogTitle: `Nell Vandaele — ${localTitle}`,
+  ogDescription: localDescription,
+  ogType: 'website',
+  ogLocale: 'fr_FR',
+  ogSiteName: 'Nell Vandaele',
+  twitterCard: 'summary_large_image',
+})
+
+// Structured data makes the profession and the city explicit for search
+// engines, beyond the visible title and meta description.
+useHead({
+  link: [{ rel: 'canonical', href: `${siteUrl}/` }],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: 'Nell Vandaele',
+        url: siteUrl,
+        jobTitle: localTitle,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Bordeaux',
+          addressCountry: 'FR',
+        },
+      }),
+    },
+  ],
 })
 definePageMeta({ navbar: false })
 
@@ -266,7 +302,9 @@ const cta = {
 
         <div class="mt-8 flex items-center justify-between gap-6">
           <div>
-            <h1 class="font-mattone text-4xl font-extrabold md:text-5xl">{{ profile.name }}</h1>
+            <h1 class="font-mattone text-4xl font-extrabold md:text-5xl">
+              {{ profile.name }}<span class="sr-only"> — {{ localTitle }}</span>
+            </h1>
             <p class="mt-3 max-w-xs text-lg leading-snug md:max-w-sm md:text-xl">{{ profile.tagline }}</p>
             <span class="mt-4 inline-block rounded bg-[#EDF77C] px-2 py-1 text-s font-medium text-[#0E0E10]">
               {{ profile.status }}
@@ -385,29 +423,29 @@ const cta = {
       </div>
 
       <!-- Contact CTA -->
-      <section
-        id="contact"
-        class="relative overflow-hidden bg-[#0E0E10] px-5 py-20 text-center md:px-8 md:py-28"
-      >
-        <!-- 1. Circle, centered on the bottom edge (only the top half is visible) -->
-       <!-- Glow: blurred circle centered on the bottom edge -->
-          <div
-            class="pointer-events-none absolute bottom-0 left-1/2 aspect-16/9 w-[60%] -translate-x-1/2 translate-y-1/2 rounded-full bg-[#6e4af1] md:opacity-70 blur-[150px] md:w-[40%]"
-            aria-hidden="true"
-          />
-        <!-- 3. Content -->
-        <div class="relative z-10 mx-auto max-w-6xl">
-          <h2 class="font-mattone text-2xl md:text-4xl">{{ cta.title }}</h2>
-          <p class="mx-auto mt-3 max-w-xl text-lg md:text-xl">{{ cta.text }}</p>
-          <NuxtLink
-            :to="cta.to"
-            class="mt-5 inline-block font-mattone rounded bg-[#C47CF7] px-4 py-1.5 text-md text-[#0E0E10] transition hover:bg-[#F59BD3]"
-          >
-            {{ cta.label }}
-          </NuxtLink>
-        </div>
-      </section>
     </main>
+    <section
+      id="contact"
+      class="relative overflow-hidden bg-[#0E0E10] px-5 py-20 text-center md:px-8 md:py-28"
+    >
+      <!-- 1. Circle, centered on the bottom edge (only the top half is visible) -->
+     <!-- Glow: blurred circle centered on the bottom edge -->
+        <div
+          class="pointer-events-none absolute bottom-0 left-1/2 aspect-16/9 w-[60%] -translate-x-1/2 translate-y-1/2 rounded-full bg-[#6e4af1] md:opacity-70 blur-[150px] md:w-[40%]"
+          aria-hidden="true"
+        />
+      <!-- 3. Content -->
+      <div class="relative z-10 mx-auto max-w-6xl">
+        <h2 class="font-mattone text-2xl md:text-4xl">{{ cta.title }}</h2>
+        <p class="mx-auto mt-3 max-w-xl text-lg md:text-xl">{{ cta.text }}</p>
+        <NuxtLink
+          :to="cta.to"
+          class="mt-5 inline-block font-mattone rounded bg-[#C47CF7] px-4 py-1.5 text-md text-[#0E0E10] transition hover:bg-[#F59BD3]"
+        >
+          {{ cta.label }}
+        </NuxtLink>
+      </div>
+    </section>
     </div>
     </template>
   

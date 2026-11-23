@@ -10,7 +10,7 @@ const mediaUrl = useStrapiMedia()
 
 <template>
   <div class="">
-  <div class="mt-5 space-y-8 text-sm leading-snug">
+  <div class="mt-5 space-y-8 text-sm leading-snug block">
     <template v-for="block in blocks" :key="`${block.__component}-${block.id}`">
       <!-- Text: heading / paragraph / button -->
       <template v-if="block.__component === 'project.text'">
@@ -25,7 +25,7 @@ const mediaUrl = useStrapiMedia()
           :href="block.link || '#'"
           target="_blank"
           rel="noopener"
-          class="block underline whitespace-pre-line underline-offset-2"
+          class="mt-5 font-mattone block w-fit rounded bg-[#C47CF7] px-4 py-1.5 text-md text-[#0E0E10] transition hover:bg-[#F59BD3]"
         >
           {{ block.text }}
         </a>

@@ -8,14 +8,27 @@ const projectPanelOpen = useState<boolean>('project-panel-open', () => false)
 
 const { data: categories } = useProjectCategories()
 
+interface NavLink {
+  label: string
+  to: string
+  children?: NavLink[]
+}
+
 // Project categories are managed in Strapi; the other entries stay static.
-const links = computed(() => [
+// The Outils children mirror the links already listed in the footer.
+const toolsParentTo = '/outils/fiche-tech-builder'
+const toolLinks: NavLink[] = [
+  { label: 'Fiche tech builder', to: toolsParentTo },
+  { label: 'Recommandations techniques', to: 'https://techfiles.nellvand.fr/' },
+]
+
+const links = computed<NavLink[]>(() => [
   { label: 'Accueil', to: '/' },
   ...categories.value.map((category) => ({
     label: category.title,
     to: `/${strapiSlug(category.title)}`,
   })),
-  { label: 'Outils', to: '/outils/fiche-tech-builder' },
+  { label: 'Outils', to: toolsParentTo, children: toolLinks },
   { label: 'Contact', to: '/contact' },
 ])
 
@@ -68,6 +81,22 @@ watch(() => route.fullPath, () => (menuOpen.value = false))
         >
           {{ link.label }}
         </NuxtLink>
+
+        <ul
+          v-if="link.children?.length"
+          class="ml-3 mt-1 space-y-1 border-l border-black/15 pl-4"
+        >
+          <li v-for="child in link.children" :key="child.to">
+            <NuxtLink
+              :to="child.to"
+              class="block py-0.5 text-base hover:underline"
+              active-class="font-bold underline"
+              exact-active-class="font-bold underline"
+            >
+              {{ child.label }}
+            </NuxtLink>
+          </li>
+        </ul>
       </li>
     </ul>
   </nav>

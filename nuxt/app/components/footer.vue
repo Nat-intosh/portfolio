@@ -28,7 +28,7 @@ const footerColumns = computed<FooterColumn[]>(() => [
     title: 'Outils',
     links: [
       { label: 'Fiche tech builder', to: '/outils/fiche-tech-builder' },
-      { label: 'Documents techniques', to: '/outils/documents-techniques' },
+      { label: 'Recommandations techniques', to: 'https://techfiles.nellvand.fr/' },
     ],
   },
   {

@@ -119,7 +119,7 @@ const page = {
   status: 'Ouvert·e à de nouveaux projets',
   heroCredit: '',
   methodsTitle: 'Multiples façons d’échanger',
-  methodsIntro: 'Merci d’avance pour votre confiance',
+  methodsIntro: 'Merci d’avance pour votre confiance, je suis disponible à Bordeaux.',
 }
 
 const backLink = {
@@ -165,14 +165,14 @@ const contactItems = computed<ContactItem[]>(() => [
   },
   {
     key: 'instagram',
-    title: 'Via instagram',
+    title: 'Via Instagram',
     detail: `@${INSTAGRAM}`,
     href: `https://www.instagram.com/${INSTAGRAM}`,
     external: true,
   },
   {
     key: 'whatsapp',
-    title: 'Via whatsapp',
+    title: 'Via WhatsApp',
     detail: `@${WHATSAPP}`,
     // wa.me expects a phone number: swap for the real one, e.g. https://wa.me/33612345678
     href: `https://wa.me/${phoneParts.join('').replace('+', '')}`,
