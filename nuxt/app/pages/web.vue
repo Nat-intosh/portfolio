@@ -207,29 +207,29 @@ onBeforeUnmount(() => {
       </section>
 
       <!-- Contact CTA -->
-    </div>
-    <section
-      id="contact"
-      class="relative overflow-hidden bg-[#0E0E10] px-5 py-20 text-center md:px-8 md:py-28"
-    >
-      <!-- 1. Circle, centered on the bottom edge (only the top half is visible) -->
-     <!-- Glow: blurred circle centered on the bottom edge -->
+      <section
+        id="contact"
+        class="relative -mx-5 overflow-hidden bg-[#0E0E10] px-5 py-20 text-center md:-mx-8 md:px-8 md:py-28"
+      >
+        <!-- 1. Circle, centered on the bottom edge (only the top half is visible) -->
+        <!-- Glow: blurred circle centered on the bottom edge -->
         <div
           class="pointer-events-none absolute bottom-0 left-1/2 aspect-16/9 w-[60%] -translate-x-1/2 translate-y-1/2 rounded-full bg-[#6e4af1] md:opacity-70 blur-[150px] md:w-[40%]"
           aria-hidden="true"
         />
-      <!-- 3. Content -->
-      <div class="relative z-10 mx-auto max-w-6xl">
-        <h2 class="font-mattone text-2xl md:text-4xl">{{ cta.title }}</h2>
-        <p class="mx-auto mt-3 max-w-xl text-lg md:text-xl">{{ cta.text }}</p>
-        <NuxtLink
-          :to="cta.to"
-          class="mt-5 inline-block rounded bg-[#C47CF7] px-4 py-1.5 text-md text-[#0E0E10] transition hover:bg-[#F59BD3]"
-        >
-          {{ cta.label }}
-        </NuxtLink>
-      </div>
-    </section>
+        <!-- 3. Content -->
+        <div class="relative z-10 mx-auto max-w-6xl">
+          <h2 class="font-mattone text-2xl md:text-4xl">{{ cta.title }}</h2>
+          <p class="mx-auto mt-3 max-w-xl text-lg md:text-xl">{{ cta.text }}</p>
+          <NuxtLink
+            :to="cta.to"
+            class="mt-5 inline-block rounded bg-[#C47CF7] px-4 py-1.5 text-md font-mattone text-[#0E0E10] transition hover:bg-[#F59BD3]"
+          >
+            {{ cta.label }}
+          </NuxtLink>
+        </div>
+      </section>
+    </div>
 
     <!-- ─── Opened project ────────────────────────────────────────────────
          Mobile : full-screen modal (fixed, covers the navbar)
